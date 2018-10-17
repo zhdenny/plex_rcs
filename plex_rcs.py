@@ -53,11 +53,11 @@ def scan(folder):
 
 			if cfg['docker']:
 				try:
-					call(["/usr/bin/docker", "exec", "-i", cfg['container'], "/usr/lib/plexmediaserver/Plex Media Scanner", "--scan", "--refresh", "--section", section_id, "--directory", directory])
+					call(["/usr/bin/docker", "exec", "-it", "PlexMediaServer", "bash", "-c", "export LD_LIBRARY_PATH=/usr/lib/plexmediaserver;/usr/lib/plexmediaserver/Plex\ Media\ Scanner" " --scan" " --refresh" " --section {0} --directory '{1}'".format(section_id, directory)])
 				except:
 					print("Error executing docker command")
 			else:
-				os.environ['LD_LIBRARY_PATH'] = cfg['env']['LD_LIBRARY_PATH']
+				os.environ['LD_LIBRARY_PATH'] = '/usr/lib/plexmediaserver'
 				os.environ['PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR'] = cfg['env']['PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR']
 				try:
 					call(["{0}/Plex Media Scanner".format(cfg['env']['LD_LIBRARY_PATH']), "--scan", "--refresh", "--section", section_id, "--directory", directory], env=os.environ)
@@ -83,9 +83,10 @@ def tailf(logfile):
 		# Use vfs backend
 		timePrev = ''
 		for line in tail("-Fn0", logfile, _iter=True):
-			if re.match(r".*: forgetting directory cache", line):
-				f = re.sub(r"^.*\s:\s(.*):\sforgetting directory cache",r'\1', line)
-				timeCurr = re.sub(r"^.*\s([0-9]+:[0-9]+:[0-9]+)\s.*\s:\s.*:\sforgetting directory cache",r'\1', line)
+			if re.match(r".*: invalidating directory cache", line):
+				files = re.search(r": (.*)\:", line)
+                    		f = files.group(1)
+				timeCurr = re.sub(r"^.*\s([0-9]+:[0-9]+:[0-9]+)\s.*\s:\s.*:\sinvalidating directory cache",r'\1', line)
 
 				if timeCurr != timePrev:
 					print("Detected directory cache expiration: {0}".format(f))
@@ -124,7 +125,7 @@ if __name__ == "__main__":
 			print("Log file '{0}' does not exist.".format(args.logfile))
 			sys.exit(1)
 	else:
-		lf = "/var/log/syslog"
+		lf = "/mnt/user/appdata/rclone_db/rclone.log"
 		if not os.path.isfile(cf):
 			print("Log file '/var/log/syslog' does not exist.".format(args.config))
 			sys.exit(1)
