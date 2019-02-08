@@ -53,11 +53,11 @@ def scan(folder):
 
 			if cfg['docker']:
 				try:
-					call(["/usr/bin/docker", "exec", "-it", "PlexMediaServer", "bash", "-c", "export LD_LIBRARY_PATH=/usr/lib/plexmediaserver;/usr/lib/plexmediaserver/Plex\ Media\ Scanner" " --scan" " --refresh" " --section {0} --directory '{1}'".format(section_id, directory)])
+					call(["/usr/bin/docker", "exec", "-it", "PlexMediaServer", "bash", "-c", "export LD_LIBRARY_PATH=/usr/lib/plexmediaserver/lib;/usr/lib/plexmediaserver/Plex\ Media\ Scanner" " --scan" " --refresh" " --section {0} --directory '{1}'".format(section_id, directory)])
 				except:
 					print("Error executing docker command")
 			else:
-				os.environ['LD_LIBRARY_PATH'] = '/usr/lib/plexmediaserver'
+				os.environ['LD_LIBRARY_PATH'] = '/usr/lib/plexmediaserver/lib'
 				os.environ['PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR'] = cfg['env']['PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR']
 				try:
 					call(["{0}/Plex Media Scanner".format(cfg['env']['LD_LIBRARY_PATH']), "--scan", "--refresh", "--section", section_id, "--directory", directory], env=os.environ)
