@@ -30,5 +30,5 @@ plex_rcs:
   container: plex
   media_root: /media
   env:
-    LD_LIBRARY_PATH: "/usr/lib/plexmediaserver"
-    PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR: "/var/lib/plexmediaserver"
+    LD_LIBRARY_PATH: "/usr/lib/plexmediaserver/lib"
+    PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR: "/config/Library/Application Support"
